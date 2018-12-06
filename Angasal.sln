@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Angasal", "Angasal\Angasal.csproj", "{D8D0B737-9F78-41E8-AF48-D9014B66D442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngasalPI", "AngasalPI\AngasalPI.csproj", "{379F3B12-721D-492A-ABF4-B2844AE3EDBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Angasald", "Angasald\Angasald.csproj", "{203BEF41-E3BA-4899-95EF-E4010187D15D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8D0B737-9F78-41E8-AF48-D9014B66D442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8D0B737-9F78-41E8-AF48-D9014B66D442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8D0B737-9F78-41E8-AF48-D9014B66D442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8D0B737-9F78-41E8-AF48-D9014B66D442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{379F3B12-721D-492A-ABF4-B2844AE3EDBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{379F3B12-721D-492A-ABF4-B2844AE3EDBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{379F3B12-721D-492A-ABF4-B2844AE3EDBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{379F3B12-721D-492A-ABF4-B2844AE3EDBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{203BEF41-E3BA-4899-95EF-E4010187D15D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{203BEF41-E3BA-4899-95EF-E4010187D15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{203BEF41-E3BA-4899-95EF-E4010187D15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{203BEF41-E3BA-4899-95EF-E4010187D15D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F96E294-0A57-4AE2-8112-6ADBF57BB786}
+	EndGlobalSection
+EndGlobal
