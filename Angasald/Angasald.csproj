@@ -38,6 +38,9 @@
     <Reference Include="Angasal">
       <HintPath>..\Angasal\bin\Debug\Angasal.dll</HintPath>
     </Reference>
+    <Reference Include="AngasalPI">
+      <HintPath>..\Angasal\bin\Debug\AngasalPI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,11 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandArguments.cs" />
-    <Compile Include="CommandParser.cs" />
-    <Compile Include="Commands\ExitCommand.cs" />
-    <Compile Include="Commands\HelpCommand.cs" />
-    <Compile Include="ICommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

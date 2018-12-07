@@ -13,7 +13,7 @@ namespace Angasal
     /// <summary>
     /// Webserver class
     /// </summary>
-    public class Webserver : IDisposable
+    public class Webserver : IWebserver, IDisposable
     {
         /// <summary>
         /// HTTP listener
@@ -23,12 +23,103 @@ namespace Angasal
         /// <summary>
         /// Plugins
         /// </summary>
-        private IAngasalPlugin[] plugins;
+        private IPlugin[] plugins;
+
+        /// <summary>
+        /// Commands
+        /// </summary>
+        private Dictionary<string, ICommand> commandsDictionary = new Dictionary<string, ICommand>();
+
+        /// <summary>
+        /// Commands
+        /// </summary>
+        private ICommand[] commands;
+
+        /// <summary>
+        /// Standard output
+        /// </summary>
+        private TextWriter standardOutput;
+
+        /// <summary>
+        /// Error output
+        /// </summary>
+        private TextWriter errorOutput;
 
         /// <summary>
         /// Is webserver running
         /// </summary>
         public bool IsRunning
+        {
+            get
+            {
+                return (httpListener != null);
+            }
+        }
+
+        /// <summary>
+        /// Plugins
+        /// </summary>
+        public IPlugin[] Plugins
+        {
+            get
+            {
+                if (plugins == null)
+                {
+                    plugins = new IPlugin[0];
+                }
+                return plugins.Clone() as IPlugin[];
+            }
+        }
+
+        /// <summary>
+        /// Commands
+        /// </summary>
+        public ICommand[] Commands
+        {
+            get
+            {
+                if (commands == null)
+                {
+                    commands = new ICommand[0];
+                }
+                return commands.Clone() as ICommand[];
+            }
+        }
+
+        /// <summary>
+        /// Standard output
+        /// </summary>
+        public TextWriter StandardOutput
+        {
+            get
+            {
+                if (standardOutput == null)
+                {
+                    standardOutput = Console.Out;
+                }
+                return standardOutput;
+            }
+        }
+
+        /// <summary>
+        /// Error output
+        /// </summary>
+        public TextWriter ErrorOutput
+        {
+            get
+            {
+                if (errorOutput == null)
+                {
+                    errorOutput = Console.Error;
+                }
+                return errorOutput;
+            }
+        }
+
+        /// <summary>
+        /// Is webserver running
+        /// </summary>
+        public bool IsListening
         {
             get
             {
@@ -40,86 +131,200 @@ namespace Angasal
         /// Constructor
         /// </summary>
         /// <param name="httpListener">HTTP listener</param>
-        /// <param name="plugins">Plugins</param>
-        private Webserver(HttpListener httpListener, IAngasalPlugin[] plugins)
+        /// <param name="standardOutput">Standard output</param>
+        /// <param name="errorOutput">Error output</param>
+        private Webserver(HttpListener httpListener, TextWriter standardOutput, TextWriter errorOutput)
         {
             this.httpListener = httpListener;
-            this.plugins = plugins;
+            this.standardOutput = standardOutput;
+            this.errorOutput = errorOutput;
         }
 
         /// <summary>
-        /// Start webserver
+        /// Add command
         /// </summary>
-        /// <returns>Webserver if successful, otherwise "null"</returns>
-        public static Webserver Start()
+        /// <param name="command">Command</param>
+        /// <param name="commands">Commands</param>
+        private void AddCommand(ICommand command, List<ICommand> commands)
         {
-            Webserver ret = null;
+            if (command != null)
+            {
+                foreach (string key in command.Keys)
+                {
+                    string k = key.Trim().ToLower();
+                    if (commandsDictionary.ContainsKey(k))
+                    {
+                        ErrorOutput.WriteLine("Duplicate key \"" + k + "\" in \"" + command.GetType().FullName + "\". Registered command class: \"" + commandsDictionary[k].GetType().FullName + "\"");
+                    }
+                    else
+                    {
+                        commandsDictionary.Add(k, command);
+                    }
+                }
+                commands.Add(command);
+            }
+        }
+
+        /// <summary>
+        /// Reload plugins
+        /// </summary>
+        public void ReloadPlugins()
+        {
+            List<IPlugin> plugins = new List<IPlugin>();
+            List<ICommand> commands = new List<ICommand>();
+            commandsDictionary.Clear();
             try
             {
-                if (HttpListener.IsSupported)
+                string plugins_directory = Path.Combine(Environment.CurrentDirectory, "plugins");
+                UnloadPlugins();
+                if (Directory.Exists(plugins_directory))
                 {
-                    string plugins_directory = Path.Combine(Environment.CurrentDirectory, "plugins");
-                    List<IAngasalPlugin> plugins = new List<IAngasalPlugin>();
-                    if (Directory.Exists(plugins_directory))
+                    string[] files = Directory.GetFiles(plugins_directory, "*.dll");
+                    if (files != null)
                     {
-                        string[] files = Directory.GetFiles(plugins_directory, "*.dll");
-                        if (files != null)
+                        foreach (string file in files)
                         {
-                            Console.WriteLine("Loading plugins...");
-                            foreach (string file in files)
+                            if (file != null)
                             {
-                                if (file != null)
+                                try
                                 {
-                                    try
+                                    Assembly assembly = Assembly.LoadFile(file);
+                                    if (assembly != null)
                                     {
-                                        Assembly assembly = Assembly.LoadFile(file);
-                                        if (assembly != null)
+                                        Type[] types = assembly.GetExportedTypes();
+                                        if (types != null)
                                         {
-                                            Type[] types = assembly.GetExportedTypes();
-                                            if (types != null)
+                                            foreach (Type type in types)
                                             {
-                                                foreach (Type type in types)
+                                                if (type != null)
                                                 {
-                                                    if (type != null)
+                                                    if (type.IsClass && typeof(IPlugin).IsAssignableFrom(type))
                                                     {
-                                                        if (type.IsClass && typeof(IAngasalPlugin).IsAssignableFrom(type))
+                                                        IPlugin plugin = Activator.CreateInstance(type) as IPlugin;
+                                                        if (plugin != null)
                                                         {
-                                                            IAngasalPlugin plugin = (IAngasalPlugin)(Activator.CreateInstance(type));
-                                                            if (plugin != null)
+                                                            ICommand[] plugin_commands = plugin.Commands;
+                                                            if (plugin_commands != null)
                                                             {
-                                                                plugins.Add(plugin);
+                                                                foreach (ICommand plugin_command in plugin_commands)
+                                                                {
+                                                                    AddCommand(plugin_command, commands);
+                                                                }
                                                             }
+                                                            plugins.Add(plugin);
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    catch (Exception e)
+                                }
+                                catch (Exception e)
+                                {
+                                    ErrorOutput.WriteLine(e);
+                                }
+                            }
+                        }
+                    }
+                }
+                try
+                {
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    if (assembly != null)
+                    {
+                        Type[] types = assembly.GetTypes();
+                        if (types != null)
+                        {
+                            foreach (Type type in types)
+                            {
+                                if (type != null)
+                                {
+                                    if (type.IsClass && typeof(ICommand).IsAssignableFrom(type))
                                     {
-                                        Console.Error.WriteLine(e);
+                                        ICommand command = Activator.CreateInstance(type) as ICommand;
+                                        AddCommand(command, commands);
                                     }
                                 }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    ErrorOutput.WriteLine(e);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorOutput.WriteLine(e);
+            }
+            this.plugins = plugins.ToArray();
+            plugins.Clear();
+            this.commands = commands.ToArray();
+            commands.Clear();
+            foreach (IPlugin plugin in this.plugins)
+            {
+                plugin.OnLoad(this);
+            }
+        }
+
+        /// <summary>
+        /// Unload plugins
+        /// </summary>
+        private void UnloadPlugins()
+        {
+            if (plugins != null)
+            {
+                foreach (IPlugin plugin in plugins)
+                {
+                    plugin.OnUnload(this);
+                }
+                plugins = null;
+            }
+            ClearCommands();
+        }
+
+        /// <summary>
+        /// Start webserver
+        /// </summary>
+        /// <param name="port">Port</param>
+        /// <param name="allowHTTPS">Allow HTTPS</param>
+        /// <param name="standardOutput">Standard output</param>
+        /// <param name="errorOutput">Error output</param>
+        /// <returns>Webserver if successful, otherwise "null"</returns>
+        public static Webserver Start(ushort port, bool allowHTTPS, TextWriter standardOutput, TextWriter errorOutput)
+        {
+            Webserver ret = null;
+            if (standardOutput == null)
+            {
+                standardOutput = Console.Out;
+            }
+            if (errorOutput == null)
+            {
+                errorOutput = Console.Error;
+            }
+            try
+            {
+                if (HttpListener.IsSupported)
+                {
                     HttpListener http_listener = new HttpListener();
+                    standardOutput.WriteLine("Initializing webserver...");
+                    http_listener.Prefixes.Add("http://*:" + port + "/");
+                    if (allowHTTPS)
                     {
-                        Console.WriteLine("Initializing webserver...");
-                        http_listener.Prefixes.Add("http://localhost:80/");
-                        http_listener.Start();
-                        ret = new Webserver(http_listener, plugins.ToArray());
-                        http_listener.BeginGetContext(new AsyncCallback(ret.ContextReceivedCallback), null);
-                        foreach (IAngasalPlugin plugin in plugins)
-                        {
-                            plugin.OnLoad();
-                        }
-                        Console.WriteLine("Finished initializing webserver!");
+                        http_listener.Prefixes.Add("https://*:" + port + "/");
                     }
+                    http_listener.Start();
+                    ret = new Webserver(http_listener, standardOutput, errorOutput);
+                    http_listener.BeginGetContext(new AsyncCallback(ret.ContextReceivedCallback), null);
+                    standardOutput.WriteLine("Loading plugins...");
+                    ret.ReloadPlugins();
+                    standardOutput.WriteLine("Finished loading plugins!");
+                    standardOutput.WriteLine("Finished initializing webserver!");
                 }
                 else
                 {
-                    Console.Error.WriteLine("Listening to HTTP requests is not supported in this platform.");
+                    errorOutput.WriteLine("Listening to HTTP requests is not supported in this platform.");
                 }
             }
             catch (Exception e)
@@ -129,10 +334,30 @@ namespace Angasal
                     ret.Dispose();
                     ret = null;
                 }
-                Console.Error.WriteLine(e);
-                Console.ReadLine();
+                errorOutput.WriteLine(e);
             }
             return ret;
+        }
+
+        /// <summary>
+        /// Start webserver
+        /// </summary>
+        /// <param name="port">Port</param>
+        /// <param name="allowHTTPS">Allow HTTPS</param>
+        /// <returns>Webserver if successful, otherwise "null"</returns>
+        public static Webserver Start(ushort port, bool allowHTTPS)
+        {
+            return Start(port, allowHTTPS, Console.Out, Console.Error);
+        }
+
+        /// <summary>
+        /// Start webserver
+        /// </summary>
+        /// <param name="port">Port</param>
+        /// <returns>Webserver if successful, otherwise "null"</returns>
+        public static Webserver Start(ushort port)
+        {
+            return Start(port, false, Console.Out, Console.Error);
         }
 
         /// <summary>
@@ -143,35 +368,91 @@ namespace Angasal
         {
             try
             {
-                if (httpListener.IsListening)
+                if (IsListening)
                 {
                     HttpListenerContext context = httpListener.EndGetContext(asyncResult);
                     httpListener.BeginGetContext(new AsyncCallback(ContextReceivedCallback), null);
-                    foreach (IAngasalPlugin plugin in plugins)
+                    using (Stream stream = context.Response.OutputStream)
                     {
-                        plugin.OnRequest(context);
+                        foreach (IPlugin plugin in plugins)
+                        {
+                            ListenerContext listener_context = new ListenerContext(context, StandardOutput, ErrorOutput);
+                            plugin.OnRequest(listener_context);
+                            stream.Write(listener_context.ResponseBytes, 0, listener_context.ResponseBytes.Length);
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                ErrorOutput.WriteLine(e);
             }
         }
 
         /// <summary>
-        /// Close webserver
+        /// Parse command
         /// </summary>
-        public void Close()
+        /// <param name="command">Command</param>
+        public void ParseCommand(string command)
         {
+            string[] args = command.Split(' ');
+            if (args != null)
+            {
+                if (args.Length > 0)
+                {
+                    string arg = args[0];
+                    ICommand cmd = GetCommandByKey(arg);
+                    if (cmd != null)
+                    {
+                        cmd.Execute(new CommandContext(this, command.Substring((command.Length > arg.Length) ? arg.Length + 1 : arg.Length), StandardOutput, ErrorOutput));
+                    }
+                    else
+                    {
+                        ErrorOutput.WriteLine("Unknown command \"" + arg.Trim().ToLower() + "\"");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get command by key
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Command if successful, otherwise "null"</returns>
+        public ICommand GetCommandByKey(string key)
+        {
+            ICommand ret = null;
+            if (key != null)
+            {
+                string k = key.Trim().ToLower();
+                if (commandsDictionary.ContainsKey(k))
+                {
+                    ret = commandsDictionary[k];
+                }
+            }
+            return ret;
+        }
+
+        /// <summary>
+        /// Clear commands
+        /// </summary>
+        private void ClearCommands()
+        {
+            commandsDictionary.Clear();
+            commands = null;
+        }
+
+        /// <summary>
+        /// Stop webserver
+        /// </summary>
+        public void Stop()
+        {
+            UnloadPlugins();
             if (IsRunning)
             {
-                Console.WriteLine("Closing webserver...");
-                foreach (IAngasalPlugin plugin in plugins)
-                {
-                    plugin.OnUnload();
-                }
+                StandardOutput.WriteLine("Stopping webserver...");
                 httpListener.Close();
+                httpListener = null;
             }
         }
 
@@ -180,7 +461,7 @@ namespace Angasal
         /// </summary>
         public void Dispose()
         {
-            Close();
+            Stop();
         }
     }
 }

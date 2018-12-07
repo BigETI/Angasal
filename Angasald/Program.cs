@@ -1,5 +1,6 @@
 ﻿using Angasal;
 using System;
+using System.IO;
 
 /// <summary>
 /// Angasal daemon namespace
@@ -12,16 +13,6 @@ namespace Angasald
     internal class Program
     {
         /// <summary>
-        /// Keep running
-        /// </summary>
-        private static bool keepRunning = true;
-
-        /// <summary>
-        /// Keep running
-        /// </summary>
-        public static bool KeepRunning => keepRunning;
-
-        /// <summary>
         /// Main entry point
         /// </summary>
         /// <param name="args">Command line arguments</param>
@@ -29,15 +20,30 @@ namespace Angasald
         {
             try
             {
-                using (Webserver webserver = Webserver.Start())
+                using (MemoryStream output_memory_stream = new MemoryStream())
                 {
-                    if (webserver != null)
+                    using (StreamWriter output_writer = new StreamWriter(output_memory_stream))
                     {
-                        while (keepRunning)
+                        StreamReader output_reader = new StreamReader(output_memory_stream);
+                        using (Webserver webserver = Webserver.Start(80, false, output_writer, output_writer))
                         {
-                            Console.Write("$ ");
-                            CommandParser.Parse(Console.ReadLine());
+                            if (webserver != null)
+                            {
+                                while (webserver.IsRunning)
+                                {
+                                    Console.Clear();
+                                    output_writer.Flush();
+                                    output_memory_stream.Seek(0L, SeekOrigin.Begin);
+                                    Console.WriteLine(output_reader.ReadToEnd());
+                                    Console.Write("$ ");
+                                    webserver.ParseCommand(Console.ReadLine());
+                                }
+                            }
                         }
+                        Console.Clear();
+                        output_writer.Flush();
+                        output_memory_stream.Seek(0L, SeekOrigin.Begin);
+                        Console.WriteLine(output_reader.ReadToEnd());
                     }
                 }
             }
@@ -45,14 +51,6 @@ namespace Angasald
             {
                 Console.Error.WriteLine(e);
             }
-        }
-
-        /// <summary>
-        /// Stop webserver
-        /// </summary>
-        public static void StopWebserver()
-        {
-            keepRunning = false;
         }
     }
 }

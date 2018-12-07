@@ -42,6 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\HelpCommand.cs" />
+    <Compile Include="Commands\PluginsCommand.cs" />
+    <Compile Include="Commands\ReloadCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Webserver.cs" />
   </ItemGroup>

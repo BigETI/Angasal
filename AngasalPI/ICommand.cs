@@ -1,12 +1,12 @@
 ﻿/// <summary>
-/// Angasal daemon namespace
+/// Angasal programming interface namespace
 /// </summary>
-namespace Angasald
+namespace AngasalPI
 {
     /// <summary>
     /// Command interface
     /// </summary>
-    internal interface ICommand
+    public interface ICommand
     {
         /// <summary>
         /// Keys
@@ -26,7 +26,7 @@ namespace Angasald
         /// <summary>
         /// Execute command
         /// </summary>
-        /// <param name="args">Command arguments</param>
-        void Execute(CommandArguments args);
+        /// <param name="context">Command context</param>
+        void Execute(CommandContext context);
     }
 }

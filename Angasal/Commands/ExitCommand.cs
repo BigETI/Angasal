@@ -1,7 +1,9 @@
-﻿/// <summary>
-/// Angasal deamon commands namespace
+﻿using AngasalPI;
+
+/// <summary>
+/// Angasal commands namespace
 /// </summary>
-namespace Angasald.Commands
+namespace Angasal.Commands
 {
     /// <summary>
     /// Exit command class
@@ -26,10 +28,14 @@ namespace Angasald.Commands
         /// <summary>
         /// Execute command
         /// </summary>
-        /// <param name="args">Command arguments</param>
-        public void Execute(CommandArguments args)
+        /// <param name="args">Command context</param>
+        public void Execute(CommandContext context)
         {
-            Program.StopWebserver();
+            Webserver webserver = context.Webserver as Webserver;
+            if (webserver != null)
+            {
+                webserver.Stop();
+            }
         }
     }
 }
