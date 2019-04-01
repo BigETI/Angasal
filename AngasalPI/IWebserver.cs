@@ -5,9 +5,9 @@
 namespace AngasalPI
 {
     /// <summary>
-    /// Webserver interface
+    /// Web server interface
     /// </summary>
-    public interface IWebserver
+    public interface IWebServer
     {
         /// <summary>
         /// Is running

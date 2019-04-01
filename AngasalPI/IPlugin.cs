@@ -33,8 +33,8 @@ namespace AngasalPI
         /// <summary>
         /// On load
         /// </summary>
-        /// <param name="webserver">Webserver</param>
-        void OnLoad(IWebserver webserver);
+        /// <param name="webServer">Web server</param>
+        void OnLoad(IWebServer webServer);
 
         /// <summary>
         /// On request
@@ -45,7 +45,7 @@ namespace AngasalPI
         /// <summary>
         /// On unload
         /// </summary>
-        /// <param name="webserver">Webserver</param>
-        void OnUnload(IWebserver webserver);
+        /// <param name="webServer">Web server</param>
+        void OnUnload(IWebServer webServer);
     }
 }

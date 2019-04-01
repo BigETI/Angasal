@@ -41,7 +41,7 @@
   <ItemGroup>
     <Compile Include="CommandContext.cs" />
     <Compile Include="ICommand.cs" />
-    <Compile Include="IWebserver.cs" />
+    <Compile Include="IWebServer.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ListenerContext.cs" />

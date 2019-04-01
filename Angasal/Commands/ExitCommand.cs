@@ -18,12 +18,12 @@ namespace Angasal.Commands
         /// <summary>
         /// Description
         /// </summary>
-        public string Description => "Closes the webserver";
+        public string Description => "Closes the web server";
 
         /// <summary>
         /// Full description
         /// </summary>
-        public string FullDescription => "This command shuts down the webserver.";
+        public string FullDescription => "This command shuts down the web server.";
 
         /// <summary>
         /// Execute command
@@ -31,10 +31,10 @@ namespace Angasal.Commands
         /// <param name="args">Command context</param>
         public void Execute(CommandContext context)
         {
-            Webserver webserver = context.Webserver as Webserver;
-            if (webserver != null)
+            WebServer web_server = context.WebServer as WebServer;
+            if (web_server != null)
             {
-                webserver.Stop();
+                web_server.Stop();
             }
         }
     }

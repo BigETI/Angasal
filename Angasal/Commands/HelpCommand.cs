@@ -32,13 +32,13 @@ namespace Angasal.Commands
         /// <param name="context">Command context</param>
         public void Execute(CommandContext context)
         {
-            Webserver webserver = context.Webserver as Webserver;
-            if (webserver != null)
+            WebServer web_server = context.WebServer as WebServer;
+            if (web_server != null)
             {
                 ICommand command = null;
                 if (context.Arguments.Length > 0)
                 {
-                    command = webserver.GetCommandByKey(context.Arguments[0]);
+                    command = web_server.GetCommandByKey(context.Arguments[0]);
                 }
                 context.StandardOutput.WriteLine("");
                 if (command != null)
@@ -70,7 +70,7 @@ namespace Angasal.Commands
                 {
                     context.StandardOutput.WriteLine("== Help topics ==");
                     context.StandardOutput.WriteLine("");
-                    foreach (ICommand cmd in webserver.Commands)
+                    foreach (ICommand cmd in web_server.Commands)
                     {
                         if (cmd != null)
                         {

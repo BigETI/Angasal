@@ -13,9 +13,9 @@ namespace AngasalPI
     public class CommandContext
     {
         /// <summary>
-        /// Webserver
+        /// Web server
         /// </summary>
-        private IWebserver webserver;
+        private IWebServer webServer;
 
         /// <summary>
         /// Raw arguments
@@ -38,9 +38,9 @@ namespace AngasalPI
         private TextWriter errorOutput;
 
         /// <summary>
-        /// Webserver
+        /// Web server
         /// </summary>
-        public IWebserver Webserver => webserver;
+        public IWebServer WebServer => webServer;
 
         /// <summary>
         /// Raw arguments
@@ -123,24 +123,24 @@ namespace AngasalPI
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="webserver">Webserver</param>
+        /// <param name="webServer">Web server</param>
         /// <param name="rawArguments">Raw arguments</param>
-        public CommandContext(IWebserver webserver, string rawArguments)
+        public CommandContext(IWebServer webServer, string rawArguments)
         {
-            this.webserver = webserver;
+            this.webServer = webServer;
             this.rawArguments = rawArguments;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="webserver">Webserver</param>
+        /// <param name="webServer">Web server</param>
         /// <param name="rawArguments">Raw arguments</param>
         /// <param name="standardOutput">Standard output</param>
         /// <param name="errorOutput">Error output</param>
-        public CommandContext(IWebserver webserver, string rawArguments, TextWriter standardOutput, TextWriter errorOutput)
+        public CommandContext(IWebServer webServer, string rawArguments, TextWriter standardOutput, TextWriter errorOutput)
         {
-            this.webserver = webserver;
+            this.webServer = webServer;
             this.rawArguments = rawArguments;
             this.standardOutput = standardOutput;
             this.errorOutput = errorOutput;

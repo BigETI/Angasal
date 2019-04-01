@@ -31,11 +31,11 @@ namespace Angasal.Commands
         /// <param name="context">Context</param>
         public void Execute(CommandContext context)
         {
-            Webserver webserver = context.Webserver as Webserver;
-            if (webserver != null)
+            WebServer web_server = context.WebServer as WebServer;
+            if (web_server != null)
             {
                 context.StandardOutput.WriteLine("Reloading plugins...");
-                webserver.ReloadPlugins();
+                web_server.ReloadPlugins();
                 context.StandardOutput.WriteLine("Finished reloading plugins!");
             }
         }

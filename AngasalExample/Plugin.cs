@@ -19,9 +19,9 @@ namespace AngasalExample
     public class Plugin : IPlugin
     {
         /// <summary>
-        /// Webserver
+        /// Web server
         /// </summary>
-        private IWebserver webserver;
+        private IWebServer webServer;
 
         /// <summary>
         /// Commands
@@ -54,7 +54,7 @@ namespace AngasalExample
                 }
                 catch (Exception e)
                 {
-                    ((webserver == null) ? Console.Error : webserver.ErrorOutput).WriteLine(e);
+                    ((webServer == null) ? Console.Error : webServer.ErrorOutput).WriteLine(e);
                 }
                 if (ret == null)
                 {
@@ -104,7 +104,7 @@ namespace AngasalExample
                 }
                 catch (Exception e)
                 {
-                    ((webserver == null) ? Console.Error : webserver.ErrorOutput).WriteLine(e);
+                    ((webServer == null) ? Console.Error : webServer.ErrorOutput).WriteLine(e);
                 }
                 if (commands == null)
                 {
@@ -117,15 +117,15 @@ namespace AngasalExample
         /// <summary>
         /// On load
         /// </summary>
-        /// <param name="webserver">Webserver</param>
-        public void OnLoad(IWebserver webserver)
+        /// <param name="webServer">Web server</param>
+        public void OnLoad(IWebServer webServer)
         {
-            this.webserver = webserver;
-            webserver.StandardOutput.WriteLine("");
-            webserver.StandardOutput.WriteLine("\t===========================");
-            webserver.StandardOutput.WriteLine("\t= Angasal example loaded! =");
-            webserver.StandardOutput.WriteLine("\t===========================");
-            webserver.StandardOutput.WriteLine("");
+            this.webServer = webServer;
+            webServer.StandardOutput.WriteLine("");
+            webServer.StandardOutput.WriteLine("\t===========================");
+            webServer.StandardOutput.WriteLine("\t= Angasal example loaded! =");
+            webServer.StandardOutput.WriteLine("\t===========================");
+            webServer.StandardOutput.WriteLine("");
         }
 
         /// <summary>
@@ -143,14 +143,14 @@ namespace AngasalExample
         /// <summary>
         /// On unload
         /// </summary>
-        /// <param name="webserver"></param>
-        public void OnUnload(IWebserver webserver)
+        /// <param name="webServer">Web server</param>
+        public void OnUnload(IWebServer webServer)
         {
-            webserver.StandardOutput.WriteLine("");
-            webserver.StandardOutput.WriteLine("\t=============================");
-            webserver.StandardOutput.WriteLine("\t= Angasal example unloaded! =");
-            webserver.StandardOutput.WriteLine("\t=============================");
-            webserver.StandardOutput.WriteLine("");
+            webServer.StandardOutput.WriteLine("");
+            webServer.StandardOutput.WriteLine("\t=============================");
+            webServer.StandardOutput.WriteLine("\t= Angasal example unloaded! =");
+            webServer.StandardOutput.WriteLine("\t=============================");
+            webServer.StandardOutput.WriteLine("");
         }
     }
 }

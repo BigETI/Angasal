@@ -11,9 +11,9 @@ using System.Reflection;
 namespace Angasal
 {
     /// <summary>
-    /// Webserver class
+    /// Web server class
     /// </summary>
-    public class Webserver : IWebserver, IDisposable
+    public class WebServer : IWebServer, IDisposable
     {
         /// <summary>
         /// HTTP listener
@@ -46,7 +46,7 @@ namespace Angasal
         private TextWriter errorOutput;
 
         /// <summary>
-        /// Is webserver running
+        /// Is web server running
         /// </summary>
         public bool IsRunning
         {
@@ -117,7 +117,7 @@ namespace Angasal
         }
 
         /// <summary>
-        /// Is webserver running
+        /// Is web server listening
         /// </summary>
         public bool IsListening
         {
@@ -133,7 +133,7 @@ namespace Angasal
         /// <param name="httpListener">HTTP listener</param>
         /// <param name="standardOutput">Standard output</param>
         /// <param name="errorOutput">Error output</param>
-        private Webserver(HttpListener httpListener, TextWriter standardOutput, TextWriter errorOutput)
+        private WebServer(HttpListener httpListener, TextWriter standardOutput, TextWriter errorOutput)
         {
             this.httpListener = httpListener;
             this.standardOutput = standardOutput;
@@ -285,16 +285,16 @@ namespace Angasal
         }
 
         /// <summary>
-        /// Start webserver
+        /// Start web server
         /// </summary>
         /// <param name="port">Port</param>
         /// <param name="allowHTTPS">Allow HTTPS</param>
         /// <param name="standardOutput">Standard output</param>
         /// <param name="errorOutput">Error output</param>
-        /// <returns>Webserver if successful, otherwise "null"</returns>
-        public static Webserver Start(ushort port, bool allowHTTPS, TextWriter standardOutput, TextWriter errorOutput)
+        /// <returns>Web server if successful, otherwise "null"</returns>
+        public static WebServer Start(ushort port, bool allowHTTPS, TextWriter standardOutput, TextWriter errorOutput)
         {
-            Webserver ret = null;
+            WebServer ret = null;
             if (standardOutput == null)
             {
                 standardOutput = Console.Out;
@@ -308,19 +308,19 @@ namespace Angasal
                 if (HttpListener.IsSupported)
                 {
                     HttpListener http_listener = new HttpListener();
-                    standardOutput.WriteLine("Initializing webserver...");
+                    standardOutput.WriteLine("Initializing web server...");
                     http_listener.Prefixes.Add("http://*:" + port + "/");
                     if (allowHTTPS)
                     {
                         http_listener.Prefixes.Add("https://*:" + port + "/");
                     }
                     http_listener.Start();
-                    ret = new Webserver(http_listener, standardOutput, errorOutput);
+                    ret = new WebServer(http_listener, standardOutput, errorOutput);
                     http_listener.BeginGetContext(new AsyncCallback(ret.ContextReceivedCallback), null);
                     standardOutput.WriteLine("Loading plugins...");
                     ret.ReloadPlugins();
                     standardOutput.WriteLine("Finished loading plugins!");
-                    standardOutput.WriteLine("Finished initializing webserver!");
+                    standardOutput.WriteLine("Finished initializing web server!");
                 }
                 else
                 {
@@ -340,22 +340,22 @@ namespace Angasal
         }
 
         /// <summary>
-        /// Start webserver
+        /// Start web server
         /// </summary>
         /// <param name="port">Port</param>
         /// <param name="allowHTTPS">Allow HTTPS</param>
-        /// <returns>Webserver if successful, otherwise "null"</returns>
-        public static Webserver Start(ushort port, bool allowHTTPS)
+        /// <returns>Web server if successful, otherwise "null"</returns>
+        public static WebServer Start(ushort port, bool allowHTTPS)
         {
             return Start(port, allowHTTPS, Console.Out, Console.Error);
         }
 
         /// <summary>
-        /// Start webserver
+        /// Start web server
         /// </summary>
         /// <param name="port">Port</param>
-        /// <returns>Webserver if successful, otherwise "null"</returns>
-        public static Webserver Start(ushort port)
+        /// <returns>Web server if successful, otherwise "null"</returns>
+        public static WebServer Start(ushort port)
         {
             return Start(port, false, Console.Out, Console.Error);
         }
@@ -443,21 +443,21 @@ namespace Angasal
         }
 
         /// <summary>
-        /// Stop webserver
+        /// Stop web server
         /// </summary>
         public void Stop()
         {
             UnloadPlugins();
             if (IsRunning)
             {
-                StandardOutput.WriteLine("Stopping webserver...");
+                StandardOutput.WriteLine("Stopping web server...");
                 httpListener.Close();
                 httpListener = null;
             }
         }
 
         /// <summary>
-        /// Dispose webserver
+        /// Dispose web server
         /// </summary>
         public void Dispose()
         {

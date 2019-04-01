@@ -36,7 +36,7 @@ namespace Angasal.Commands
             context.StandardOutput.WriteLine("");
             if (context.Arguments.Length > 0)
             {
-                foreach (IPlugin plugin in context.Webserver.Plugins)
+                foreach (IPlugin plugin in context.WebServer.Plugins)
                 {
                     if (plugin != null)
                     {
@@ -65,7 +65,7 @@ namespace Angasal.Commands
             {
                 context.StandardOutput.WriteLine("== Plugins ==");
                 context.StandardOutput.WriteLine("");
-                foreach (IPlugin plugin in context.Webserver.Plugins)
+                foreach (IPlugin plugin in context.WebServer.Plugins)
                 {
                     if (plugin != null)
                     {
